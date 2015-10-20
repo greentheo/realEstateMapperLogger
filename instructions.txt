@@ -1,0 +1,29 @@
+notes:
+
+To get search results in a big list:  (need to define what each of the params does)
+
+http://www.zillow.com/search/GetResults.htm?spt=homes&status=100000&lt=110000&ht=111111&pr=,&mp=,&bd=0,&ba=0,&sf=,&lot=,&yr=,&pho=0&pets=0&parking=0&laundry=0&pnd=0&red=0&zso=0&days=any&ds=all&pmf=0&pf=0&zoom=11&rect=-105397854,39931986,-104907589,40039312&p=1&sort=days&zpid=13214794&search=maplist&disp=1&listright=true&isMapSearch=true&zoom=11
+
+from that page, returned results like:
+
+ "properties": [
+            [2100801254, 39934883, -104921930, "$220K", 1, 0, 0, ["$220K", 2, 3.0, 1792, false, "http://photos2.zillowstatic.com/p_a/IShbscvxsalzyt0000000000.jpg", "1,219 sqft lot"]],
+            [122013663, 39987144, -105033005, "$700K", 1, 0, 0, ["$700K", 5, 4.0, 4700, false, "http://photos1.zillowstatic.com/p_a/ISpxawqhcsu0fa0000000000.jpg", "7,426 sqft lot"]],
+            [12953805, 39938885, -104972118, "$352K", 1, 0, 0, ["$352K", 4, 3.0, 2440, false, "http://photos1.zillowstatic.com/p_a/ISlig7ax8hgexu0000000000.jpg", "7,254 sqft lot"]],
+            [58653668, 39948190, -104952283, "$400K", 1, 0, 0, ["$400K", 3, 3.0, 4185, false, "http://photos2.zillowstatic.com/p_a/IS5id0po2mouaf1000000000.jpg", "7,413 sqft lot"]],
+            [58652895, 39949599, -104918884, "$329K", 1, 0, 0, ["$329K", 4, 3.0, 3213, false, "http://photos1.zillowstatic.com/p_a/IS9xju5yxjwqwt1000000000.jpg", "6,098 sqft lot"]],
+
+can be used in and of themselves.
+
+first column is a zpid, plug it into here (in the parameter and at the end):
+
+http://www.zillow.com/jsonp/Hdp.htm?zpid=2100801254&fad=false&hc=true&lhdp=false&callback=YUI.Env.JSONP.handleHomeDetailPage2100801254
+
+
+last, a property page (with more details can be found with a link at the bottom of the page)
+
+ ["send", "pageview", "\/homedetails\/13721-Holly-St-D-Thornton-CO-80241\/2100801254_zpid\/#ForSale"]
+
+More detail can be gotten from this page.
+
+	
