@@ -26,4 +26,10 @@ last, a property page (with more details can be found with a link at the bottom 
 
 More detail can be gotten from this page.
 
+
+Need to look into user agent spoofing:  http://osxdaily.com/2011/07/16/change-user-agent-with-curl/
+
+And do a test for how many requests per day exceed the threshold to get kicked off of zillow.
+
+
 	
