@@ -63,6 +63,8 @@ bb = c(min(rawData$long), min(rawData$lat), max(rawData$long), max(rawData$lat))
 ggmap(get_map(location=bb, maptype="toner", source="stamen"), extent="normal", 
       base_layer=ggplot(rawData, aes(x=long, y=lat, color=factor(cluster))))+#geom_density2d(data=rawData, aes(x=long, y=lat))+
   geom_point(size=5)
+
+plot(OSMMap(rawData, color = "cluster", popup = "price"))
   
 ggplot(rawData, aes(x=log(lot*sqft*baths*beds), y=log(price)))+geom_point()+geom_smooth(method="lm")
 ggplot(rawData, aes(x=log(lot*sqft*baths*beds), y=(price), color=factor(cluster)))+geom_point()+coord_trans(y="log2")+facet_wrap(~cluster)
