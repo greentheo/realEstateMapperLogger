@@ -16,6 +16,7 @@ uagent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTM
 
 
 for(j in 1:nrow(fetches)){
+Sys.sleep(rexp(n = 1,rate = 1/30))  
 basedata = html_session(
   with(fetches[j,], 
        paste0("http://www.zillow.com/search/GetResults.htm?spt=homes&status=",status,"&lt=",lt,"&ht=",ht,
