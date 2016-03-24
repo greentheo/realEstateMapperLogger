@@ -9,6 +9,10 @@ library(maptools)
 library(httr)
 library(RJSONIO)
 library(dplyr)
+library(shiny)
+library(multidplyr)
+library(broom)
+library(tidyr)
 
 options(digits = 6)
 
@@ -18,7 +22,9 @@ se = html_session("https://httpbin.org/user-agent", user_agent(uagent))
 se$response$request
 
 #ht=100010 = houses and lots, ht=100000 = houses
-basedata = html_session("http://www.zillow.com/search/GetResults.htm?spt=homes&status=100000&lt=110000&ht=100000&pr=,&mp=,&bd=0,&ba=0,&sf=,&lot=,&yr=,&pho=0&pets=0&parking=0&laundry=0&pnd=0&red=0&zso=0&days=any&ds=all&pmf=0&pf=0&zoom=12&rect=-105157854,39951986,-105007589,40075312&p=1&sort=days&zpid=13214794&search=maplist&disp=1&listright=true&isMapSearch=true&zoom=11")
+basedata = html_session(
+  "http://www.zillow.com/search/GetResults.htm?spt=homes&status=100000&lt=110000&ht=100000&pr=,&mp=,&bd=0,&ba=0,&sf=,&lot=,&yr=,&pho=0&pets=0&parking=0&laundry=0&pnd=0&red=0&zso=0&days=any&ds=all&pmf=0&pf=0&zoom=12&rect=-105157854,39951986,-105007589,40075312&p=1&sort=days&zpid=13214794&search=maplist&disp=1&listright=true&isMapSearch=true&zoom=11"
+                        ,user_agent(uagent))
 
 baseJSON = fromJSON(rawToChar(basedata$response$content))
 
@@ -64,15 +70,21 @@ ggmap(get_map(location=bb, maptype="toner", source="stamen"), extent="normal",
       base_layer=ggplot(rawData, aes(x=long, y=lat, color=factor(cluster))))+#geom_density2d(data=rawData, aes(x=long, y=lat))+
   geom_point(size=5)
 
-plot(OSMMap(rawData, color = "cluster", popup = "price"))
+
+rawData$popup = paste("Price: ",rawData$price, sep="") 
+plot(OSMMap(rawData, color = "cluster", popup = "popup"))
   
 ggplot(rawData, aes(x=log(lot*sqft*baths*beds), y=log(price)))+geom_point()+geom_smooth(method="lm")
 ggplot(rawData, aes(x=log(lot*sqft*baths*beds), y=(price), color=factor(cluster)))+geom_point()+coord_trans(y="log2")+facet_wrap(~cluster)
 ggplot(rawData, aes(x=log(lot*sqft*baths*beds), y=log(price),color=factor(cluster)))+geom_point()+geom_smooth(method="lm")+facet_wrap(~cluster)
 
 
-
-rawData$residuals = lm(log(price)~log(lot*sqft*baths*beds), data=rawData)$residuals
+View( rawData %>% 
+  group_by(cluster) %>%
+  do(mod = lm(log(price)~log(lot*sqft*baths*beds), data=.)) %>%
+  glance(mod) %>%
+  arrange(cluster, desc(.resid)))
+  
 
 View(rawData %>% arrange(desc(residuals)))
 

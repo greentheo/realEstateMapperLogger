@@ -31,5 +31,35 @@ Need to look into user agent spoofing:  http://osxdaily.com/2011/07/16/change-us
 
 And do a test for how many requests per day exceed the threshold to get kicked off of zillow.
 
+ht key (hometype)
+1 - houses  
+1 - Condos
+1 - apartments
+1 - manufactured
+1 - land
+1 - townhomes
 
-	
+lt key (listing type - )
+1  - by agent (in conjuction with status 1)
+1 - by owner ( status 1)
+1 - foreclosures
+1 - new construction
+1 - OpenHouse Only
+1 - Coming Soon
+
+status
+1 - for sale 
+1 - makeMeMove
+1 - recently sold
+1 - pending listings
+1 - rent
+1 - potential listings (goes with pf=1/0, pmf=1/0)
+
+pnd = 1/0 pending 
+pf = 1/0 preforeclosure
+pmf = 1/0 foreclosured
+pr = price range 175000,300000 =  $175k to $300k
+
+
+
+
