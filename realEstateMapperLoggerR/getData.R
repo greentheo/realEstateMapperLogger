@@ -4,6 +4,7 @@ library(rvest)
 library(httr)
 library(RJSONIO)
 library(dplyr)
+library(stringr)
 
 
 ## get some data
