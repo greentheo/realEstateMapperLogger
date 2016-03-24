@@ -9,7 +9,7 @@ library(stringr)
 
 ## get some data
 
-fetches = read.csv('searchList.csv', colClasses = c("character","integer","integer","integer","integer",rep("character",3)))
+fetches = read.csv('/home/production/realEstateMapperLogger/realEstateMapperLoggerR/searchList.csv', colClasses = c("character","integer","integer","integer","integer",rep("character",3)))
 
 options(digits = 6)
 
@@ -63,7 +63,7 @@ for(i in 1:length(baseJSON$map$properties)){
 
 rawData$price = ifelse(rawData$price<100, as.numeric(rawData$price)*1e6, rawData$price)
 
-write.csv(data.frame(rawData, date=Sys.Date()), file = paste0('rawData/',fetches$name[j],'_',Sys.Date()))
+write.csv(data.frame(rawData, date=Sys.Date()), file = paste0('/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/',fetches$name[j],'_',Sys.Date()))
 
 }
 
