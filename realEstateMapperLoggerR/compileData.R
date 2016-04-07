@@ -13,7 +13,9 @@ if(Sys.info()["sysname"]=="Darwin"){
   files = data.frame(fullpath=paste0('~/githubrepo/realEstateMapperLogger/realEstateMapperLoggerR/rawData/', files),
                      fileName=files)
 }else{
-  
+  files=list.files('/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/',pattern = '*')
+  files = data.frame(fullpath=paste0('/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/', files),
+                     fileName=files) 
 }
 
 readData = function(file){
@@ -39,7 +41,8 @@ dataActiveSummary = dataAll %>%
             maxPrice=max(price),
             minPrice=min(price),
             currentPrice=price[length(price)],
-            priceTrend=(price[1]-price[length(price)])/lengthOnMarket) %>%
+            priceTrend=(price[1]-price[length(price)])/lengthOnMarket,
+            mostRecentListingDate=max(Date)) %>%
   filter(lengthOnMarket>0)
 
 dataSoldSummary = dataAll %>% 
@@ -62,9 +65,9 @@ if(Sys.info()["sysname"]=="Darwin"){
   
 }else{
   write.csv(dataActiveSummary, 
-            '~/githubrepo/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataActiveSummary.csv')
+            '/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataActiveSummary.csv')
   write.csv(dataSoldSummary, 
-            '~/githubrepo/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataSoldSummary.csv')
+            '/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataSoldSummary.csv')
   
 }
 
