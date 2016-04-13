@@ -43,7 +43,7 @@ dataActiveSummary = dataAll %>%
             currentPrice=price[length(price)],
             priceTrend=(price[1]-price[length(price)])/lengthOnMarket,
             mostRecentListingDate=max(Date)) %>%
-  filter(lengthOnMarket>0)
+  filter(lengthOnMarket>=0)
 
 dataSoldSummary = dataAll %>% 
   filter(str_detect(groupName, 'recentlysold')) %>%

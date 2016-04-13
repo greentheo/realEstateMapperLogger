@@ -81,7 +81,9 @@ server <- shinyServer(function(input, output, session) {
        #do some modelling per region 
        dataA = dataActive %>%
          filter(groupName==input$regionSelect) %>%
-         mutate(price=currentPrice) 
+         mutate(price=currentPrice,
+                priceK=paste0(round(price/1000, digits=0), "k"),
+                lotAC=round(lot/40000,digits = 2)) 
        
        
         if(grepl('land',input$regionSelect)){
@@ -104,14 +106,20 @@ server <- shinyServer(function(input, output, session) {
              mutate(loglot = ifelse(lot>0, log(lot), 0)) %>%
              do(cbind(., augment(lm(log(price)~log(lot), data=.)))) %>%
               mutate(predPrice=exp(.fitted),
-                     res=predPrice-price)
+                     res=predPrice-price,
+                     resK=paste0(round(abs(res)/1000, digits=0), "k ", ifelse(res<0,"over", "under")),
+                     rankLotPriceRes=rank(-lot)+rank(price)+rank(-res),
+                     rankPriceRes=rank(price)+rank(-res))
         }else{
           dataA=dataA %>%
             filter(ymd(mostRecentListingDate)>ymd(input$modelStart), price>input$lowerPrice, price<input$upperPrice, log(price)>7.5) %>%
             group_by(cluster) %>%
             do(cbind(., augment(lm(log(price)~log(lot)+log(sqft)+baths+beds, data=.)))) %>%
             mutate(predPrice=exp(.fitted),
-                   res=predPrice-price)
+                   res=predPrice-price,
+                   resK=paste0(round(abs(res)/1000, digits=0), "k ", ifelse(res<0,"over", "under")),
+                   rankLotPriceRes=rank(-sqft)+rank(price)+rank(-res),
+                   rankPriceRes=rank(price)+rank(-res))
         }
        
        data$dataActive = dataA
@@ -128,10 +136,10 @@ server <- shinyServer(function(input, output, session) {
        return( data$dataActive %>%
                  filter(ymd(mostRecentListingDate)>ymd(input$displayStart)) %>%
                  mutate(link=paste0("http://www.zillow.com/homedetails/",zpid,"_zpid/?view=public")) %>%
-                select(mostRecentListingDate,zpid, sqft, lot, beds, baths, currentPrice,
-                       res,lengthOnMarket,
-                       priceTrend, cluster,link, .resid) %>%
-                  arrange(desc(ymd(mostRecentListingDate)), .resid)
+                select(mostRecentListingDate,zpid, sqft, lotAC, beds, baths, priceK,
+                       resK,lengthOnMarket,
+                       priceTrend, cluster,link, rankLotPriceRes, rankPriceRes) %>%
+                  arrange(desc(ymd(mostRecentListingDate)), rankPriceRes)
        )
        }
    })
@@ -141,10 +149,10 @@ server <- shinyServer(function(input, output, session) {
        # browser()
        dataplot = data$dataActive %>% 
          filter(ymd(mostRecentListingDate)>ymd(input$displayStart)) %>% data.frame()
-       dataplot[["color"]] = ifelse(dataplot$res<quantile(dataplot$res, probs = .25, na.rm = T), "#00ff00", "#000000")
+       dataplot[["color"]] = ifelse(dataplot$rankPriceRes<quantile(dataplot$rankPriceRes, probs = .25, na.rm = T), "#00ff00", "#000000")
        dataplot[["popup"]]= paste0("<h3>",dataplot$zpid,
-                                      "</h3><p>Under-Over Value: ",dataplot$res,"</p>",
-                                      "<p>Price: ", dataplot$price,"</p>",
+                                      "</h3><p>Under-Over Value: ",dataplot$resK,"</p>",
+                                      "<p>Price: ", dataplot$priceK,"</p>",
                                       "<a href='http://www.zillow.com/homedetails/",dataplot$zpid,"_zpid/?view=public'>link</a>",
                                       "<p>Beds:",dataplot$beds ,"</p>",
                                       "<p>Baths: ",dataplot$baths,"</p>",
