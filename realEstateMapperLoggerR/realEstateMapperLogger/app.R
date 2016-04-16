@@ -41,6 +41,9 @@ ui <- shinyUI(fluidPage(
          ,dataTableOutput("propertyTable")
          ,plotOutput("activePlot")
          ,plotOutput("timePlot")
+         ,plotOutput("volumePlot")
+         ,plotOutput('lotMarketPlot')
+         ,plotOutput('lomPrice')
       )
    )
 ))
@@ -80,7 +83,8 @@ server <- shinyServer(function(input, output, session) {
         # browser()
        #do some modelling per region 
        dataA = dataActive %>%
-         filter(groupName==input$regionSelect) %>%
+         filter(groupName==input$regionSelect,
+                lot>2000) %>%
          mutate(price=currentPrice,
                 priceK=paste0(round(price/1000, digits=0), "k"),
                 lotAC=round(lot/40000,digits = 2)) 
@@ -177,11 +181,42 @@ server <- shinyServer(function(input, output, session) {
      #             numSold=count(price)
      #             )
      
-     ggplot(data$dataActive , aes(x=mostRecentListingDate, y=log(price), color=factor(cluster)))+
+     ggplot(data$dataActive %>% filter(ymd(mostRecentListingDate)<ymd(Sys.Date())) , aes(x=ymd(mostRecentListingDate), y=log(price), color=factor(cluster)))+
        geom_point(size=3)+
        # geom_bar(aes(x=mostRecentListingDate, y=log(numSold), fill=factor(cluster)))
        geom_smooth(method="lm")+
        labs(title='Active Properties Over Time')
+     }
+   })
+   output$volumePlot = renderPlot({
+     if(!is.null(data$dataActive)){
+       # browser()
+       # dataPlot = data$dataActive %>%
+       #   group_by(mostRecentListingDate,) %>%
+       #   summarize(price=mean(log(price)),
+       #             numSold=count(price)
+       #             )
+       
+       ggplot(data$dataActive %>% filter(ymd(mostRecentListingDate)<ymd(Sys.Date())) , aes(x=ymd(mostRecentListingDate)))+
+         geom_bar()+
+         # geom_bar(aes(x=mostRecentListingDate, y=log(numSold), fill=factor(cluster)))
+         labs(title='Properties Taken Offline Over Time')
+     }
+   })
+   output$lotMarketPlot = renderPlot({
+     if(!is.null(data$dataActive)){
+       # browser()
+       # dataPlot = data$dataActive %>%
+       #   group_by(mostRecentListingDate,) %>%
+       #   summarize(price=mean(log(price)),
+       #             numSold=count(price)
+       #             )
+       
+       ggplot(data$dataActive %>% filter(ymd(mostRecentListingDate)<ymd(Sys.Date())) , aes(x=ymd(mostRecentListingDate), y=lengthOnMarket, color=factor(cluster)))+
+         geom_point(size=3)+
+         # geom_bar(aes(x=mostRecentListingDate, y=log(numSold), fill=factor(cluster)))
+         # geom_smooth()+
+         labs(title='Length on Market over Time')
      }
    })
    output$activePlot = renderPlot({
@@ -195,6 +230,23 @@ server <- shinyServer(function(input, output, session) {
          
        }else{
          ggplot(data$dataActive, aes(x=log(lot*sqft*baths*beds),y=log(price), color=factor(cluster)))+
+           geom_point(size=3)+
+           geom_smooth(method="lm")+
+           labs(title='Active Properties')
+       }
+     }
+   })
+   output$lomPrice = renderPlot({
+     
+     if(!is.null(data$dataActive)){
+       if(grepl('land',input$regionSelect)){  
+         ggplot(data$dataActive %>% filter(ymd(mostRecentListingDate)<ymd(Sys.Date())), aes(x=log(price),y=lengthOnMarket, color=factor(cluster)))+
+           geom_point(size=3)+
+           geom_smooth(method="lm")+
+           labs(title='Active Properties')
+         
+       }else{
+         ggplot(data$dataActive %>% filter(ymd(mostRecentListingDate)<ymd(Sys.Date())), aes(x=log(price),y=lengthOnMarket, color=factor(cluster)))+
            geom_point(size=3)+
            geom_smooth(method="lm")+
            labs(title='Active Properties')
