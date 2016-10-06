@@ -59,14 +59,14 @@ for(j in 1:nrow(fetches)){
         str_replace('[M]','') %>%
         str_replace('[K]', '000') %>% 
         as.character() %>% as.numeric()
-      rawData$sqft[i] = ifelse(is.null(properties[[i]][[8]][[4]]), NA, properties[[i]][[8]][[4]])
-      lotsize = properties[[i]][[8]][[7]]
+      rawData$sqft[i] = ifelse(is.null(properties[[i]][[9]][[4]]), NA, properties[[i]][[9]][[4]])
+      lotsize = properties[[i]][[9]][[7]]
       rawData$lot[i] = ifelse(str_detect(lotsize," ac lot"),
                               as.numeric(str_replace(lotsize, " ac lot", replacement = ""))*43560,
                               as.numeric(str_replace(lotsize, " sqft lot", replacement = "") %>%
                                            str_replace(",","")))
-      rawData$baths[i] = ifelse(is.null(properties[[i]][[8]][[3]]), NA, properties[[i]][[8]][[3]])
-      rawData$beds[i] = ifelse(is.null(properties[[i]][[8]][[2]]), NA,properties[[i]][[8]][[2]])
+      rawData$baths[i] = ifelse(is.null(properties[[i]][[9]][[3]]), NA, properties[[i]][[9]][[3]])
+      rawData$beds[i] = ifelse(is.null(properties[[i]][[9]][[2]]), NA,properties[[i]][[9]][[2]])
       rawData$type[i] = properties[[i]][[5]]
     }
     
