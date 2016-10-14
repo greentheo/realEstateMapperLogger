@@ -6,6 +6,7 @@ library(dplyr)
 library(stringr)
 library(magrittr)
 library(lubridate)
+library(RODBC)
 
 
 if(Sys.info()["sysname"]=="Darwin"){
@@ -55,6 +56,8 @@ dataSoldSummary = dataAll %>%
 
 
 #write the summary data
+db = odbcConnect('localMySql')
+sqlQuery(db, 'USE REMapper')
 
 if(Sys.info()["sysname"]=="Darwin"){
   
@@ -62,12 +65,17 @@ if(Sys.info()["sysname"]=="Darwin"){
             '~/githubrepo/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataActiveSummary.csv')
   write.csv(dataSoldSummary, 
             '~/githubrepo/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataSoldSummary.csv')
-  
+  ## upload the results to the DB
 }else{
   write.csv(dataActiveSummary, 
             '/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataActiveSummary.csv')
   write.csv(dataSoldSummary, 
             '/home/production/realEstateMapperLogger/realEstateMapperLoggerR/rawData/dataSoldSummary.csv')
+  ## upload results to the DB
+  sqlQuery(db, 'drop table dataActiveSummary;')
+  sqlQuery(db, 'drop table dataSoldSummary;')
+  sqlSave(channel = db, dat = dataActiveSummary)
+  sqlSave(channel = db, dat = dataSoldSummary)
   
 }
 
